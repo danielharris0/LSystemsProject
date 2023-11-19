@@ -84,6 +84,15 @@ public class Turtle : MonoBehaviour {
 
     public GameObject CreateCylinderBetweenPoints(GameObject parent, Vector3 p1, Vector3 p2, float r1, float r2, Color col1, Color col2) {
         GameObject branch = new GameObject();
+
+        float length = (p2 - p1).magnitude;
+
+        branch.AddComponent<Sway>();
+        Sway sway = branch.GetComponent<Sway>();
+        sway.amplitude = 5/length;
+        sway.frequency = 5.0f/length;
+        
+
         MeshFilter meshFilter = branch.AddComponent<MeshFilter>();
         MeshRenderer meshRenderer = branch.AddComponent<MeshRenderer>();
         meshRenderer.material = materials[state.tubeMaterialIndex];
@@ -93,8 +102,7 @@ public class Turtle : MonoBehaviour {
         options.colA = col1;
         options.colB = col2;
 
-        Debug.Log(r1);
-        meshFilter.mesh = MeshBuilder.Tube((p2 - p1).magnitude, 12, r1, r2, options);
+        meshFilter.mesh = MeshBuilder.Tube(length, 12, r1, r2, options);
 
         branch.transform.position = p1;
         branch.transform.LookAt(p2);
@@ -119,11 +127,11 @@ public class Turtle : MonoBehaviour {
     public void Start() {
         state.parent = gameObject;
 
-        int n = 5;
+        int n = 6;
         List<ContextFreeSymbol> word = new List<ContextFreeSymbol>{ new Fern(0, n) };
         for (int i = 0; i < n; i++) { word = Parser.Iterate(word); }
         word.Reverse();
         Draw(new Stack<ContextFreeSymbol>(word.ToArray()));
-        MeshMerger.MergeMeshes(gameObject,materials[0]);
+        //MeshMerger.MergeMeshes(gameObject,materials[0]);
     }
 }
