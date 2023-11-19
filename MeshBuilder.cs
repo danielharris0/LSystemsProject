@@ -3,6 +3,7 @@ using UnityEngine;
 public static class MeshBuilder {
 
     public class TubeOptions {
+        public bool hasEnds = true;
         public bool hasNormals = true;
         public bool hasTangents = true;
         public bool hasColours = false;
@@ -11,7 +12,7 @@ public static class MeshBuilder {
         public Color colB;
     }
 
-    public static Mesh Tube(bool hasEnds, int n, float rA, float rB, TubeOptions options) {
+    public static Mesh Tube(float length, int n, float rA, float rB, TubeOptions options) {
 
         /*
          
@@ -44,12 +45,12 @@ public static class MeshBuilder {
         int ID_DUPLICATE_VERT_A = 2 * n + 0;
         int ID_DUPLICATE_VERT_B = 2 * n + 1;
 
-        if (hasEnds) { NUM_VERTS += 2; } //Two end verts
+        if (options.hasEnds) { NUM_VERTS += 2; } //Two end verts
         int ID_END_VERT_A = 2 * n + 2;
         int ID_END_VERT_B = 2 * n + 3;
 
         int NUM_TRIS = 2 * n;
-        if (hasEnds) { NUM_TRIS += 2 * n; } //Each end has n triangles
+        if (options.hasEnds) { NUM_TRIS += 2 * n; } //Each end has n triangles
 
         //Per-Vertex:
         Vector3[] vertices = new Vector3[NUM_VERTS]; 
@@ -72,7 +73,7 @@ public static class MeshBuilder {
                 float theta = i * deltaTheta + deltaTheta * z * 0.5f;
                 int CURRENT_VERT = i + n * z;
 
-                vertices[CURRENT_VERT] = Quaternion.AngleAxis(theta, Vector3.forward) * Vector3.up * radius + new Vector3(0, 0, z);
+                vertices[CURRENT_VERT] = Quaternion.AngleAxis(theta, Vector3.forward) * Vector3.up * radius + new Vector3(0, 0, z*length);
 
                 colours[CURRENT_VERT] = colour;
 
@@ -93,7 +94,7 @@ public static class MeshBuilder {
         }
         
         //Add ends
-        if (hasEnds) {
+        if (options.hasEnds) {
             //Two end vertices
             vertices[ID_END_VERT_A] = new Vector3(0, 0, 0);
             colours[ID_END_VERT_A] = options.colA;
@@ -101,7 +102,7 @@ public static class MeshBuilder {
             tangents[ID_END_VERT_A] = Vector3.forward;
             uvs[ID_END_VERT_A] = new Vector2(0.5f, 1);
 
-            vertices[ID_END_VERT_B] = new Vector3(0, 0, 1);
+            vertices[ID_END_VERT_B] = new Vector3(0, 0, length);
             colours[ID_END_VERT_B] = options.colB;
             normals[ID_END_VERT_B] = Vector3.back;
             tangents[ID_END_VERT_B] = Vector3.forward;
@@ -139,7 +140,7 @@ public static class MeshBuilder {
          triangles[0] = ID_DUPLICATE_VERT_A; triangles[1] = ID_DUPLICATE_VERT_B;  //Blue case
          triangles[3 * (2 * n - 1) + 2] = ID_DUPLICATE_VERT_A; //Yellow case
 
-        if (hasEnds) {
+        if (options.hasEnds) {
              //Fix the last triangles of each face
              triangles[3 * (2 * n + n - 1) + 0] = ID_END_VERT_A;
              triangles[3 * (2 * n + n - 1) + 1] = ID_DUPLICATE_VERT_A;
