@@ -78,7 +78,13 @@ public class Turtle : MonoBehaviour {
         MeshFilter meshFilter = branch.AddComponent<MeshFilter>();
         MeshRenderer meshRenderer = branch.AddComponent<MeshRenderer>();
         meshRenderer.material = materials[state.tubeMaterialIndex];
-        meshFilter.mesh = MeshBuilder.Tube(true, 6, r1, r2, col1, col2);
+
+        MeshBuilder.TubeOptions options = new MeshBuilder.TubeOptions();
+        options.hasColours = true;
+        options.colA = col1;
+        options.colB = col2;
+
+        meshFilter.mesh = MeshBuilder.Tube(true, 6, r1, r2, options);
 
         branch.transform.position = p1;
         branch.transform.localScale = new Vector3(1, 1, (p2 - p1).magnitude);
@@ -95,10 +101,10 @@ public class Turtle : MonoBehaviour {
     }
 
     public void Start() {
-        List<ContextFreeSymbol> word = new List<ContextFreeSymbol>{ new ContextFreeSeed(0) };
+        List<ContextFreeSymbol> word = new List<ContextFreeSymbol>{ new Fern(1) };
         for (int i = 0; i < 6; i++) { word = Parser.Iterate(word); }
         word.Reverse();
         Draw(new Stack<ContextFreeSymbol>(word.ToArray()));
-        MeshMerger.MergeMeshes(gameObject,materials[0]);
+        //MeshMerger.MergeMeshes(gameObject,materials[0]);
     }
 }

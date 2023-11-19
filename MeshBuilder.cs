@@ -2,7 +2,16 @@ using UnityEngine;
 
 public static class MeshBuilder {
 
-    public static Mesh Tube(bool hasEnds, int n, float rA, float rB, Color colA, Color colB) {
+    public class TubeOptions {
+        public bool hasNormals = true;
+        public bool hasTangents = true;
+        public bool hasColours = false;
+
+        public Color colA;
+        public Color colB;
+    }
+
+    public static Mesh Tube(bool hasEnds, int n, float rA, float rB, TubeOptions options) {
 
         /*
          
@@ -54,9 +63,9 @@ public static class MeshBuilder {
 
         float deltaTheta = 360 / n;
         float radius = rA;
-        Color colour = colA;
+        Color colour = options.colA;
         for (int z = 0; z < 2; z++) { //Two z-layers: start and end
-            if (z == 1) { radius = rB; colour = colB; }
+            if (z == 1) { radius = rB; colour = options.colB; }
             for (int i = 0; i < n; i++) { //n vertices per layer
                 //We proceed anticlockwise (pov end A) around the cylinder, from uv.x=n/n, uv.x=(n-1)/n to uv.x=1/n, but never reaching uv.x=0: that is what our duplicate vertices fix
 
@@ -87,13 +96,13 @@ public static class MeshBuilder {
         if (hasEnds) {
             //Two end vertices
             vertices[ID_END_VERT_A] = new Vector3(0, 0, 0);
-            colours[ID_END_VERT_A] = colA;
+            colours[ID_END_VERT_A] = options.colA;
             normals[ID_END_VERT_A] = Vector3.back;
             tangents[ID_END_VERT_A] = Vector3.forward;
             uvs[ID_END_VERT_A] = new Vector2(0.5f, 1);
 
             vertices[ID_END_VERT_B] = new Vector3(0, 0, 1);
-            colours[ID_END_VERT_B] = colB;
+            colours[ID_END_VERT_B] = options.colB;
             normals[ID_END_VERT_B] = Vector3.back;
             tangents[ID_END_VERT_B] = Vector3.forward;
             uvs[ID_END_VERT_B] = new Vector2(0.5f, 0);
@@ -143,9 +152,9 @@ public static class MeshBuilder {
         Mesh mesh = new Mesh();
         mesh.vertices = vertices;
         mesh.triangles = triangles;
-        mesh.normals = normals;
+        if (options.hasNormals) { mesh.normals = normals; }
         mesh.uv = uvs;
-        mesh.colors = colours;
+        if (options.hasColours) { mesh.colors = colours; }
         return mesh;
     }
 
