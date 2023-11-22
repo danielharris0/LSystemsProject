@@ -21,16 +21,20 @@ public static class MeshMerger{
             }
         }
 
+        parent.transform.gameObject.SetActive(true);
+
+        while (parent.transform.childCount>0) {
+            Object.DestroyImmediate(parent.transform.GetChild(0).gameObject);
+        }
+
+        GameObject newObj = new GameObject();
+        newObj.transform.SetParent(parent.transform);
+
         Mesh mesh = new Mesh();
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         mesh.CombineMeshes(combine);
-        parent.transform.gameObject.AddComponent<MeshFilter>().sharedMesh = mesh;
-        parent.transform.gameObject.AddComponent<MeshRenderer>().material = material;
-        parent.transform.gameObject.SetActive(true);
-
-        foreach (Transform child in parent.transform) {
-            Object.Destroy(child.gameObject);
-        }
+        newObj.transform.gameObject.AddComponent<MeshFilter>().sharedMesh = mesh;
+        newObj.transform.gameObject.AddComponent<MeshRenderer>().material = material;
     }
 
 }

@@ -39,7 +39,7 @@ public class PlaceQuad : ContextFreeTerminal {
 
     public override void Turtle(Turtle t) {
         GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        GameObject.Destroy(obj.GetComponent<MeshCollider>());
+        GameObject.DestroyImmediate(obj.GetComponent<MeshCollider>());
         MeshRenderer meshRenderer = obj.GetComponent<MeshRenderer>();
         meshRenderer.material = spriteMaterial;
 
@@ -92,6 +92,7 @@ public class TurtleState {
     public Color startColour = Color.clear;
     public bool tubing = true;
     public int tubeMaterialIndex = 0;
+    public Material cylinderMaterial = Resources.Load<Material>("Bark/Bark_ParticleShader");
 
     public GameObject parent;
     public TurtleState Copy() {
@@ -99,24 +100,23 @@ public class TurtleState {
     }
 }
 
-public class Turtle : MonoBehaviour {
-
-    public Material[] materials;
+public class Turtle {
 
     public GameObject CreateCylinderBetweenPoints(GameObject parent, Vector3 p1, Vector3 p2, float r1, float r2, Color col1, Color col2) {
         GameObject branch = new GameObject();
 
         float length = (p2 - p1).magnitude;
 
+        /*
         branch.AddComponent<Sway>();
         Sway sway = branch.GetComponent<Sway>();
         sway.amplitude = 5/length;
         sway.frequency = 5.0f/length;
-        
+        */
 
         MeshFilter meshFilter = branch.AddComponent<MeshFilter>();
         MeshRenderer meshRenderer = branch.AddComponent<MeshRenderer>();
-        meshRenderer.material = materials[state.tubeMaterialIndex];
+        meshRenderer.material = state.cylinderMaterial;
 
         MeshBuilder.TubeOptions options = new MeshBuilder.TubeOptions();
         options.hasColours = true;
@@ -139,20 +139,11 @@ public class Turtle : MonoBehaviour {
 
     public TurtleState state = new TurtleState();
     public Stack<TurtleState> stack = new Stack<TurtleState>();
-    public void Draw(Stack<ContextFreeSymbol> word) {
+    public void Draw(GameObject parentObject, Stack<ContextFreeSymbol> word) {
+        state.parent = parentObject;
         while (word.Count>0) {
             word.Pop().Turtle(this);
         }
     }
 
-    public void Start() {
-        state.parent = gameObject;
-
-        int n = 6;
-        List<ContextFreeSymbol> word = new List<ContextFreeSymbol>{ new Fern(0, n) };
-        for (int i = 0; i < n; i++) { word = Parser.Iterate(word); }
-        word.Reverse();
-        Draw(new Stack<ContextFreeSymbol>(word.ToArray()));
-        //MeshMerger.MergeMeshes(gameObject,materials[0]);
-    }
 }

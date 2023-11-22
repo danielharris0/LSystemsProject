@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Fern : ContextFreeSymbol {
+public class GradientTree : ContextFreeSymbol {
 
     private static Material leafMaterial = Resources.Load<Material>("Leaf/leaf_texture");
 
@@ -12,7 +12,8 @@ public class Fern : ContextFreeSymbol {
 
     private float age;
     private float maxAge;
-    public Fern(float a, float n) { age = a; maxAge = n; }
+    public GradientTree(int numIterations) { age = 0; maxAge = numIterations; }
+    public GradientTree(float a, float n) { age = a; maxAge = n; }
 
     private Move GetMove() {
         float n = age / maxAge;
@@ -30,7 +31,7 @@ public class Fern : ContextFreeSymbol {
             new Turn(left),
             new Push(),
             new Push(),
-            new Fern(age+1, maxAge),
+            new GradientTree(age+1, maxAge),
             new Pop(),
             new Turn(right),
             GetMove(),
@@ -40,10 +41,10 @@ public class Fern : ContextFreeSymbol {
             new Push(),
             new Turn(right),
             GetMove(),
-            new Fern(age+1, maxAge),
+            new GradientTree(age+1, maxAge),
             new Pop(),
             new Turn(left),
-            new Fern(age+1, maxAge)
+            new GradientTree(age+1, maxAge)
         };
     }
 }
