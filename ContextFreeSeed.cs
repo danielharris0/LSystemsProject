@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Fern : ContextFreeSymbol {
 
+    private static Material leafMaterial = Resources.Load<Material>("Leaf/leaf_texture");
+
     private static Quaternion left = Quaternion.AngleAxis(-25, Vector3.up) * Quaternion.AngleAxis(30, Vector3.forward);
     private static Quaternion right = Quaternion.AngleAxis(25, Vector3.up) * Quaternion.AngleAxis(30, Vector3.forward);
     private static float sizeMult = 0.6f;
@@ -17,14 +19,13 @@ public class Fern : ContextFreeSymbol {
         float l = Interpolation.Cosine(4f, 0.5f, n); //Mathf.Lerp(20f, 1f, n);
         //We interpolate AREA linearly
         float r = Interpolation.Linear(0.4f, 0.00005f, n); //Mathf.Lerp(4f, 0.05f, n);
-        Debug.Log(r);
-
         Color colour = Color.Lerp(new Color(0.84f, 0.58f, 0.25f), new Color(0.58f, 0.81f, 0.51f), n);
         return new Move(l, r, colour);
     }
 
     public override List<ContextFreeSymbol> Produce() {
         return new List<ContextFreeSymbol> {
+            new PlaceQuad(Vector3.zero, Quaternion.identity, leafMaterial),
             GetMove(),
             new Turn(left),
             new Push(),

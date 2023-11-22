@@ -8,9 +8,10 @@ public class Sway : MonoBehaviour {
     public float amplitude;
     public float frequency;
 
-    private float offset = Random.Range(0.0f, Mathf.PI);
+    private float offset;
 
     void Start() {
+        offset = Random.Range(0.0f, Mathf.PI);
         baseRotation = transform.rotation;
     }
 

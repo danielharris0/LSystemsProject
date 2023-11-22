@@ -28,6 +28,27 @@ public class StartTubing : ContextFreeTerminal {
     }
 }
 
+public class PlaceQuad : ContextFreeTerminal {
+
+    Vector3 offset;
+    Quaternion rotation;
+    Material spriteMaterial;
+    public PlaceQuad(Vector3 o, Quaternion r, Material m) {
+        offset = o; rotation = r; spriteMaterial = m;
+    }
+
+    public override void Turtle(Turtle t) {
+        GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        GameObject.Destroy(obj.GetComponent<MeshCollider>());
+        MeshRenderer meshRenderer = obj.GetComponent<MeshRenderer>();
+        meshRenderer.material = spriteMaterial;
+
+        obj.transform.SetParent(t.state.parent.transform, false);
+        obj.transform.position += offset;
+        obj.transform.rotation *= rotation;
+    }
+}
+
 public class Move : ContextFreeTerminal {
     public float distance;
     public float finalRadius;
