@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum TurtleRelativeInstructions { Foward };
 public class Push : ContextFreeTerminal {
     public override void Turtle(Turtle t) {
         t.stack.Push(t.state);
@@ -44,8 +45,8 @@ public class PlaceQuad : ContextFreeTerminal {
         meshRenderer.material = spriteMaterial;
 
         obj.transform.SetParent(t.state.parent.transform, false);
-        obj.transform.position += offset;
         obj.transform.rotation *= rotation;
+        obj.transform.position += t.state.parent.transform.rotation*offset;
     }
 }
 
@@ -107,12 +108,12 @@ public class Turtle {
 
         float length = (p2 - p1).magnitude;
 
-        /*
+        
         branch.AddComponent<Sway>();
         Sway sway = branch.GetComponent<Sway>();
         sway.amplitude = 5/length;
         sway.frequency = 5.0f/length;
-        */
+        
 
         MeshFilter meshFilter = branch.AddComponent<MeshFilter>();
         MeshRenderer meshRenderer = branch.AddComponent<MeshRenderer>();

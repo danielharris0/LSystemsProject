@@ -10,13 +10,13 @@ public class GradientTree : ContextFreeSymbol {
     private static Quaternion right = Quaternion.AngleAxis(25, Vector3.up) * Quaternion.AngleAxis(30, Vector3.forward);
     private static float sizeMult = 0.6f;
 
-    private float age;
-    private float maxAge;
+    private int age;
+    private int maxAge;
     public GradientTree(int numIterations) { age = 0; maxAge = numIterations; }
-    public GradientTree(float a, float n) { age = a; maxAge = n; }
+    public GradientTree(int a, int n) { age = a; maxAge = n; }
 
     private Move GetMove() {
-        float n = age / maxAge;
+        float n = (float) age / (float) maxAge;
         float l = Interpolation.Cosine(4f, 0.5f, n); //Mathf.Lerp(20f, 1f, n);
         //We interpolate AREA linearly
         float r = Interpolation.Linear(0.4f, 0.00005f, n); //Mathf.Lerp(4f, 0.05f, n);
@@ -25,26 +25,32 @@ public class GradientTree : ContextFreeSymbol {
     }
 
     public override List<ContextFreeSymbol> Produce() {
-        return new List<ContextFreeSymbol> {
-            new PlaceQuad(Vector3.zero, Quaternion.identity, leafMaterial),
-            GetMove(),
-            new Turn(left),
-            new Push(),
-            new Push(),
-            new GradientTree(age+1, maxAge),
-            new Pop(),
-            new Turn(right),
-            GetMove(),
-            new Pop(),
-            new Turn(right),
-            GetMove(),
-            new Push(),
-            new Turn(right),
-            GetMove(),
-            new GradientTree(age+1, maxAge),
-            new Pop(),
-            new Turn(left),
-            new GradientTree(age+1, maxAge)
-        };
+        if (age==maxAge) {
+            return new List<ContextFreeSymbol> {
+                GetMove(),
+                new PlaceQuad(Vector3.forward*0.6f, Quaternion.AngleAxis(90, Vector3.up) * Quaternion.AngleAxis(180, Vector3.forward), leafMaterial)
+            };
+        } else {
+            return new List<ContextFreeSymbol> {
+                GetMove(),
+                new Turn(left * Quaternion.Slerp(Quaternion.identity, Random.rotationUniform, 0.1f)),
+                new Push(),
+                new Push(),
+                new GradientTree(age+1, maxAge),
+                new Pop(),
+                new Turn(right),
+                GetMove(),
+                new Pop(),
+                new Turn(right),
+                GetMove(),
+                new Push(),
+                new Turn(right),
+                GetMove(),
+                new GradientTree(age+1, maxAge),
+                new Pop(),
+                new Turn(left),
+                new GradientTree(age+1, maxAge)
+            };
+        }
     }
 }

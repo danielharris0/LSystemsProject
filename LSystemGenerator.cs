@@ -9,11 +9,18 @@ public enum Seed {ClassicFern, GradientTree}
 public class LSystemGenerator : MonoBehaviour {
     
     public Seed seedType;
+    public int setRandomSeed;
     public bool mergeMeshes;
+    public bool randomiseSeed;
     public int numIterations;
 
     public void Generate() {
         Debug.Log("Generating...");
+
+        if (randomiseSeed) {
+            setRandomSeed = UnityEngine.Random.Range(0, 1000);
+        }
+        UnityEngine.Random.InitState(setRandomSeed);
 
         //Kill existing children
         while (transform.childCount > 0) {
@@ -21,7 +28,7 @@ public class LSystemGenerator : MonoBehaviour {
         }
 
         Type type = Type.GetType(seedType.ToString());
-        ContextFreeSymbol seed = (ContextFreeSymbol)Activator.CreateInstance(type, new System.Object[] { numIterations});
+        ContextFreeSymbol seed = (ContextFreeSymbol)Activator.CreateInstance(type, new System.Object[] { numIterations - 1});
 
         Turtle t = new Turtle();
         t.state.parent = gameObject;
