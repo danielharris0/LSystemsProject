@@ -1,30 +1,32 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using Word = System.Collections.Generic.List<ContextFreeSymbol>;
 
 //A context free parametric L-system
 //Since we're context free, each symbol can just have their own production rules as a (non)deterministic method
 
 //In future we could upgrade to a normal L-system, or a context-free RGG
 
-public abstract class ContextFreeSymbol {
-    public abstract List<ContextFreeSymbol> Produce();
 
-    public virtual void Turtle(Turtle t) { }
-}
-
-public abstract class ContextFreeTerminal : ContextFreeSymbol {
-    public override List<ContextFreeSymbol> Produce() {
-        return new List<ContextFreeSymbol> { this };
-    }
-
-}
 public static class Parser {
-    public static List<ContextFreeSymbol> Iterate(List<ContextFreeSymbol> word) {
-        List<ContextFreeSymbol> newWord = new List<ContextFreeSymbol>();
+    public static Word Iterate(Word word) {
+        Word newWord = new Word();
         for (int i=0; i<word.Count; i++) {
             newWord.AddRange(word[i].Produce());
         }
         return newWord;
+    }
+    public static void Print(Word word) {
+        string s = "";
+        for (int i = 0; i < word.Count; i++) { s += word[i].ToString() + ", "; }
+        Debug.Log(s);
+    }
+    public static void Interpret(Word word) {
+
+        Vector3 pos = Vector3.zero;
+        Quaternion orientation = Quaternion.LookRotation(Vector3.up, Vector3.right);
+
+        //for (int i = 0; i < word.Count; i++) {
+        //    newWord.AddRange(word[i].Produce());
+        //}
     }
 }

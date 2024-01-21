@@ -15,24 +15,28 @@ public class ClassicFern : ContextFreeSymbol {
 
     public override List<ContextFreeSymbol> Produce() {
         return new List<ContextFreeSymbol> {
-            new Move(size*5f, size*0.5f, Color.white),
-            new Turn(left),
-            new Push(),
-            new Push(),
+            new TurtleSymbols.Move(size*5f, size*0.5f, Color.white),
+            new TurtleSymbols.Turn(left),
+            new TurtleSymbols.Push(),
+            new TurtleSymbols.Push(),
             new ClassicFern(size * sizeMult),
-            new Pop(),
-            new Turn(right),
-            new Move(size*5f, size*0.5f, Color.white),
-            new Pop(),
-            new Turn(right),
-            new Move(size*5f, size*0.5f, Color.white),
-            new Push(),
-            new Turn(right),
-            new Move(size*5f, size*0.5f, Color.white),
+            new TurtleSymbols.Pop(),
+            new TurtleSymbols.Turn(right),
+            new TurtleSymbols.Move(size*5f, size*0.5f, Color.white),
+            new TurtleSymbols.Pop(),
+            new TurtleSymbols.Turn(right),
+            new TurtleSymbols.Move(size*5f, size*0.5f, Color.white),
+            new TurtleSymbols.Push(),
+            new TurtleSymbols.Turn(right),
+            new TurtleSymbols.Move(size*5f, size*0.5f, Color.white),
             new ClassicFern(size * sizeMult),
-            new Pop(),
-            new Turn(left),
+            new TurtleSymbols.Pop(),
+            new TurtleSymbols.Turn(left),
             new ClassicFern(size * sizeMult)
         };
+    }
+
+    public override string ToString() {
+        return "Fern";
     }
 }

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GradientTree : ContextFreeSymbol {
+public class NewTree : ContextFreeSymbol {
 
     private static Material leafMaterial = Resources.Load<Material>("Leaf/leafMaterial");
     private static Material[] materials;
@@ -13,17 +13,17 @@ public class GradientTree : ContextFreeSymbol {
 
     private int age;
     private int maxAge;
-    public GradientTree(int numIterations) {
+    public NewTree(int numIterations) {
         Debug.Log("new gradient tree num 1");
         materials = new Material[10];
         for (int i=0; i<10; i++) {
             materials[i] = new Material(leafMaterial.shader);
             materials[i].mainTexture = leafMaterial.mainTexture;
-            materials[i].color = Color.Lerp(Color.white, Color.red, (float) i / 9);
+            materials[i].color = Color.Lerp(Color.white, Color.yellow, (float) i / 9);
         }
         age = 0; maxAge = numIterations; 
     }
-    public GradientTree(int a, int n) { age = a; maxAge = n; }
+    public NewTree(int a, int n) { age = a; maxAge = n; }
 
     private TurtleSymbols.Move GetMove() {
         float n = (float) age / (float) maxAge;
@@ -46,7 +46,7 @@ public class GradientTree : ContextFreeSymbol {
                 new TurtleSymbols.Turn(left * Quaternion.Slerp(Quaternion.identity, Random.rotationUniform, 0.1f)),
                 new TurtleSymbols.Push(),
                 new TurtleSymbols.Push(),
-                new GradientTree(age+1, maxAge),
+                new NewTree(age+1, maxAge),
                 new TurtleSymbols.Pop(),
                 new TurtleSymbols.Turn(right),
                 GetMove(),
@@ -56,10 +56,10 @@ public class GradientTree : ContextFreeSymbol {
                 new TurtleSymbols.Push(),
                 new TurtleSymbols.Turn(right),
                 GetMove(),
-                new GradientTree(age+1, maxAge),
+                new NewTree(age+1, maxAge),
                 new TurtleSymbols.Pop(),
                 new TurtleSymbols.Turn(left),
-                new GradientTree(age+1, maxAge)
+                new NewTree(age+1, maxAge)
             };
         }
     }

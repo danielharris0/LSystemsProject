@@ -16,6 +16,6 @@ public class Sway : MonoBehaviour {
     }
 
     void Update() {
-        transform.rotation = baseRotation * Quaternion.Euler((Mathf.Sin(Time.time* frequency + offset) -0.5f)* amplitude, (Mathf.Cos(Time.time*frequency + offset) - 0.5f)* amplitude, 0);
+        transform.rotation = baseRotation * Quaternion.AngleAxis(Mathf.Sin(Time.time * frequency + offset)* amplitude, Vector3.up) * Quaternion.AngleAxis(Mathf.Cos(Time.time * frequency + offset) * amplitude, Vector3.right);
     }
 }

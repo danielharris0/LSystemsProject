@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 
 
-public enum Seed {ClassicFern, GradientTree}
+public enum Seed {ClassicFern, GradientTree, NewTree}
 
 public class LSystemGenerator : MonoBehaviour {
     
@@ -30,13 +30,18 @@ public class LSystemGenerator : MonoBehaviour {
         Type type = Type.GetType(seedType.ToString());
         ContextFreeSymbol seed = (ContextFreeSymbol)Activator.CreateInstance(type, new System.Object[] { numIterations - 1});
 
-        Turtle t = new Turtle();
+        DrawingTurtle t = new DrawingTurtle();
         t.state.parent = gameObject;
 
         List<ContextFreeSymbol> word = new List<ContextFreeSymbol> { seed };
-
         //Parse: iteratively expand
-        for (int i = 0; i < numIterations; i++) { word = Parser.Iterate(word); }
+        for (int i = 0; i < numIterations; i++) {
+            Debug.Log(i);
+            Parser.Print(word);
+            Parser.Interpret(word); //generate parameters for environ.-sensitive nodes
+            Parser.Print(word);
+            word = Parser.Iterate(word);
+        }
 
         //Interpret with turtle: creating tree of objects
         word.Reverse();
