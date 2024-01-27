@@ -4,8 +4,9 @@ using UnityEngine;
 public class TurtleSymbols {
 
     public class StopTubing2 : Terminal {
-        public override void Apply(GeometryState s) {
+        public override bool Apply(GeometryState s) {
             s.tubing = false;
+            return true;
         }
 
         public override string ToString() { return "StopTubing"; }
@@ -13,8 +14,9 @@ public class TurtleSymbols {
     }
 
     public class StopTubing : Terminal {
-        public override void Apply(GeometryState s) {
+        public override bool Apply(GeometryState s) {
             s.tubing = false;
+            return true;
         }
 
         public override string ToString() { return "StopTubing"; }
@@ -22,8 +24,9 @@ public class TurtleSymbols {
     }
 
     public class StartTubing : Terminal {
-        public override void Apply(GeometryState s) {
+        public override bool Apply(GeometryState s) {
             s.tubing = true;
+            return true;
         }
 
         public override string ToString() { return "StartTubing"; }
@@ -42,7 +45,7 @@ public class TurtleSymbols {
             offset = o; rotation = r; spriteMaterial = m;
         }
 
-        public override void Apply(GeometryState s) {
+        public override bool Apply(GeometryState s) {
             GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Quad);
             GameObject.DestroyImmediate(obj.GetComponent<MeshCollider>());
             MeshRenderer meshRenderer = obj.GetComponent<MeshRenderer>();
@@ -51,20 +54,23 @@ public class TurtleSymbols {
             obj.transform.SetParent(s.parent.transform, false);
             obj.transform.rotation *= rotation;
             obj.transform.position += s.parent.transform.rotation * offset;
+
+            return true;
         }
     }
 
     public class Push : Terminal {
-        public override void Apply<T>(StackState<T> s) {
+        public override bool Apply<T>(StackState<T> s) {
             s.stack.Push(s.state);
             s.state = (T) s.state.Copy();
+            return true;
         }
 
         public override string ToString() { return "["; }
     }
 
     public class Pop : Terminal {
-        public override void Apply<T>(StackState<T> s) { s.state = s.stack.Pop(); }
+        public override bool Apply<T>(StackState<T> s) { s.state = s.stack.Pop(); return true; }
 
         public override string ToString() { return "]"; }
 
@@ -74,9 +80,6 @@ public class TurtleSymbols {
         public float distance;
         public float finalRadius;
         public Color finalColour;
-        
-        private Vector3 startPosition;
-        private Vector3 endPosition;
 
         public Move(float d, float r, Color c) {
             distance = d; finalRadius = r; finalColour = c;
@@ -84,26 +87,35 @@ public class TurtleSymbols {
 
         public override string ToString() { return "MoveDrawing"; }
 
-        public override void Apply(TraversalState s) {
-            startPosition = s.position; //assuming this is by-value
+        public override bool Apply(TraversalState s) {
             s.position += s.orientation * Vector3.forward * distance;
-            endPosition = s.position; //assuming this is by-value
+            return true;
         }
 
-        //assuming  traversal before geometry
-        public override void Apply(GeometryState s) {
-            if (s.startColour == Color.clear) { //initial state
-                s.startColour = finalColour;
-                s.startRadius = finalRadius;
+        public override bool Apply<T1, T2> (CombinedState<T1, T2> s) {
+
+            if (!(s.s1 is TraversalState && s.s2 is GeometryState)) return false;
+            TraversalState s1 = s.s1 as TraversalState;
+            GeometryState s2 = s.s2 as GeometryState;
+
+            Vector3 end = s1.position + s1.orientation * Vector3.forward * distance;
+
+            if (s2.startColour == Color.clear) { //initial state
+                s2.startColour = finalColour;
+                s2.startRadius = finalRadius;
             }
 
-            if (s.tubing) {
-                GameObject obj = Geometry.CreateCylinderBetweenPoints(s.parent, startPosition, endPosition, s.startRadius, finalRadius, s.startColour, finalColour, s.cylinderMaterial);
-                s.parent = obj;
+            if (s2.tubing) {
+                GameObject obj = Geometry.CreateCylinderBetweenPoints(s2.parent, s1.position, end, s2.startRadius, finalRadius, s2.startColour, finalColour, s2.cylinderMaterial);
+                s2.parent = obj;
             }
 
-            s.startColour = finalColour;
-            s.startRadius = finalRadius;
+            s2.startColour = finalColour;
+            s2.startRadius = finalRadius;
+
+            s1.position = end;
+
+            return true;
         }
 
     }
@@ -112,8 +124,9 @@ public class TurtleSymbols {
         public Quaternion rotation;
         public Turn(Quaternion r) { rotation = r; }
         public override string ToString() { return "Turn"; }
-        public override void Apply(TraversalState s) {
+        public override bool Apply(TraversalState s) {
             s.orientation *= rotation;
+            return true;
         }
     }
 

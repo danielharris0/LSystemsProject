@@ -33,9 +33,15 @@ public class GeometryState : State {
 }
 
 public class CombinedState<T1, T2> : State where T1 : State where T2 : State {
-    T1 s1; T2 s2;
+    public T1 s1;
+    public T2 s2;
     public CombinedState(T1 s1, T2 s2) { this.s1 = s1; this.s2 = s2; }
-    public override void Parse(Terminal t) { s1.Parse(t); s2.Parse(t); }
+    public override void Parse(Terminal t) {
+        if (!t.Apply(this)) {
+            s1.Parse(t);
+            s2.Parse(t);
+        }
+    }
     public override State Copy() { return new CombinedState<T1, T2>((T1)s1.Copy(), (T2)s2.Copy()); }
 }
 
@@ -43,7 +49,9 @@ public class StackState<T> : State where T : State {
     public T state;
     public Stack<T> stack = new Stack<T>();
     public StackState(T state) { this.state = state; }
-    public override void Parse(Terminal t) { t.Apply(this); state.Parse(t); }
+    public override void Parse(Terminal t) {
+        if (!t.Apply(this)) state.Parse(t);
+    }
 }
 
 class Turtle {

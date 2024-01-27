@@ -13,8 +13,9 @@ public abstract class Terminal : ContextFreeSymbol {
         return new Word { this };
     }
 
-    public virtual void Apply(TraversalState state) {}
-    public virtual void Apply(GeometryState state) {}
-    public virtual void Apply<T>(StackState<T> state) where T : State {}
+    public virtual bool Apply(TraversalState state) { return false; }
+    public virtual bool Apply(GeometryState state) { return false; }
+    public virtual bool Apply<T>(StackState<T> state) where T : State { return false; }
+    public virtual bool Apply<T1, T2> (CombinedState<T1, T2> state) where T1 : State where T2 : State { return false; }
 
 }
