@@ -30,8 +30,6 @@ public class LSystemGenerator : MonoBehaviour {
         Type type = Type.GetType(seedType.ToString());
         ContextFreeSymbol seed = (ContextFreeSymbol)Activator.CreateInstance(type, new System.Object[] { numIterations - 1});
 
-        DrawingTurtle t = new DrawingTurtle();
-        t.state.parent = gameObject;
 
         List<ContextFreeSymbol> word = new List<ContextFreeSymbol> { seed };
         //Parse: iteratively expand
@@ -44,8 +42,14 @@ public class LSystemGenerator : MonoBehaviour {
         }
 
         //Interpret with turtle: creating tree of objects
-        word.Reverse();
-        t.Draw(gameObject, new Stack<ContextFreeSymbol>(word.ToArray()));
+          new Turtle(
+            new StackState<CombinedState<TraversalState, GeometryState>>(
+                new CombinedState<TraversalState, GeometryState>(
+                    new TraversalState(),
+                    new GeometryState(gameObject)
+        )))
+            .Parse(word);
+
 
         //Post-Ops on the created tree
         if (mergeMeshes) { MeshMerger.MergeMeshes(gameObject, Resources.Load<Material>("Bark/Bark_ParticleShader")); }
