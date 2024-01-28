@@ -46,11 +46,11 @@ public static class Parser {
             if (s is Cut) {
                 //Cut
                 while (!(word[i] is TurtleSymbols.Pop)) i++; i--;
-            } else if (s is Terminal) {
+            } else {
                 //Parse by turtle
-                state.Parse((Terminal) s);
+                state.Parse(s);
+                s.ResolveQueryParameters(state);
             }
-            s.ResolveQueryParameters(state);
         }
     }
 }

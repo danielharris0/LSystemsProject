@@ -18,6 +18,11 @@ public class F : ContextSensitiveSymbol { //Internode F
 
         return null;
     }
+
+    public override bool Apply<T1, T2>(CombinedState<T1, T2> state) {
+        return TurtleFunctions.Move<T1, T2>(state, 1, 1, Color.white);
+    }
+
     public override string ToString() { return "F"; }
 }
 

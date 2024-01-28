@@ -3,7 +3,7 @@ using UnityEngine;
 
 
 public abstract class State {
-    public abstract void Parse(Terminal t);
+    public abstract void Parse(Symbol t);
     public virtual State Copy() {
         return (State)this.MemberwiseClone(); //Note: we need to ensure all state members are structs/primitives
     }
@@ -14,7 +14,7 @@ public abstract class State {
 public class TraversalState : State {
     public Vector3 position = Vector3.zero;
     public Quaternion orientation = Quaternion.LookRotation(Vector3.up, Vector3.right);
-    public override void Parse(Terminal t) { t.Apply(this); }
+    public override void Parse(Symbol t) { t.Apply(this); }
 
 }
 
@@ -27,7 +27,7 @@ public class GeometryState : State {
 
     public GameObject parent;
 
-    public override void Parse(Terminal t) { t.Apply(this); }
+    public override void Parse(Symbol t) { t.Apply(this); }
     public GeometryState(GameObject parent) { this.parent = parent; }
 
 }
@@ -36,7 +36,7 @@ public class CombinedState<T1, T2> : State where T1 : State where T2 : State {
     public T1 s1;
     public  T2 s2;
     public CombinedState(T1 s1, T2 s2) { this.s1 = s1; this.s2 = s2; }
-    public override void Parse(Terminal t) {
+    public override void Parse(Symbol t) {
         if (!t.Apply(this)) {
             s1.Parse(t);
             s2.Parse(t);
@@ -49,7 +49,7 @@ public class StackState<T> : State where T : State {
     public T state;
     public Stack<T> stack = new Stack<T>();
     public StackState(T state) { this.state = state; }
-    public override void Parse(Terminal t) {
+    public override void Parse(Symbol t) {
         if (!t.Apply(this)) state.Parse(t);
     }
 }
@@ -59,7 +59,7 @@ class Turtle {
     public Turtle(State s) { state = s; }
     public void Parse(List<Symbol> word) {
         foreach (Symbol symbol in word) {
-            if (symbol is Terminal) state.Parse((Terminal) symbol);
+            state.Parse(symbol);
         }
     }
 }

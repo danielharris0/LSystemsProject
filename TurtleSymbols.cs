@@ -3,16 +3,6 @@ using UnityEngine;
 
 public class TurtleSymbols {
 
-    public class StopTubing2 : Terminal {
-        public override bool Apply(GeometryState s) {
-            s.tubing = false;
-            return true;
-        }
-
-        public override string ToString() { return "StopTubing"; }
-
-    }
-
     public class StopTubing : Terminal {
         public override bool Apply(GeometryState s) {
             s.tubing = false;
