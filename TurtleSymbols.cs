@@ -94,9 +94,10 @@ public class TurtleSymbols {
 
         public override bool Apply<T1, T2> (CombinedState<T1, T2> s) {
 
-            if (!(s.s1 is TraversalState && s.s2 is GeometryState)) return false;
             TraversalState s1 = s.s1 as TraversalState;
             GeometryState s2 = s.s2 as GeometryState;
+
+            if (s1==null || s2==null) return false;
 
             Vector3 end = s1.position + s1.orientation * Vector3.forward * distance;
 

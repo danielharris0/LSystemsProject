@@ -13,8 +13,8 @@ public class ClassicFern : ContextFreeSymbol {
     public ClassicFern(int numIterations) { size = 1; }
     public ClassicFern(float s) { size = s; }
 
-    public override List<ContextFreeSymbol> Produce() {
-        return new List<ContextFreeSymbol> {
+    public override List<Symbol> Produce() {
+        return new List<Symbol> {
             new TurtleSymbols.Move(size*5f, size*0.5f, Color.white),
             new TurtleSymbols.Turn(left),
             new TurtleSymbols.Push(),

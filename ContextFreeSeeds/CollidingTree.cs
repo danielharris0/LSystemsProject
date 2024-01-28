@@ -1,70 +1,94 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Word = System.Collections.Generic.List<Symbol>;
 
-public class CollidingTree : ContextFreeSymbol {
+#nullable enable
 
-    private static Material leafMaterial = Resources.Load<Material>("Leaf/leafMaterial");
-    private static Material[] materials;
+public static class PruningFunctions {
+    public static int L = 10;
+    //Prunes to LxLxL cube centered at the origin
+    public static bool Prune(Vector3 p) =>  p.x < -L / 2 || p.x > L / 2 || p.y < -L / 2 || p.y > L / 2 || p.z < -L / 2 || p.z > L / 2;
+}
 
-    private static Quaternion left = Quaternion.AngleAxis(-25, Vector3.up) * Quaternion.AngleAxis(30, Vector3.forward);
-    private static Quaternion right = Quaternion.AngleAxis(25, Vector3.up) * Quaternion.AngleAxis(30, Vector3.forward);
-    private static float sizeMult = 0.6f;
+public class F : ContextSensitiveSymbol { //Internode F
+    public override Word? Produce(Word context, int i) {
+        if (Parser.Right<T>(context, i)) return new List<Symbol> { new S() };
+        if (Parser.Right<S>(context, i)) return new List<Symbol> { new S(), new F() }; //propogates S basipetally (down)
 
-    private int age;
-    private int maxAge;
-    public CollidingTree(int numIterations) {
-        Debug.Log("new gradient tree num 1");
-        materials = new Material[10];
-        for (int i=0; i<10; i++) {
-            materials[i] = new Material(leafMaterial.shader);
-            materials[i].mainTexture = leafMaterial.mainTexture;
-            materials[i].color = Color.Lerp(Color.white, Color.yellow, (float) i / 9);
-        }
-        age = 0; maxAge = numIterations; 
+        return null;
     }
-    public CollidingTree(int a, int n) { age = a; maxAge = n; }
+    public override string ToString() { return "F"; }
+}
 
-    private TurtleSymbols.Move GetMove() {
-        float n = (float) age / (float) maxAge;
-        float l = Interpolation.Cosine(4f, 0.5f, n); //Mathf.Lerp(20f, 1f, n);
-        //We interpolate AREA linearly
-        float r = Interpolation.Linear(0.4f, 0.00005f, n); //Mathf.Lerp(4f, 0.05f, n);
-        Color colour = Color.Lerp(new Color(0.84f, 0.58f, 0.25f), new Color(0.58f, 0.81f, 0.51f), n);
-        return new TurtleSymbols.Move(l, r, colour);
+public class A : ContextSensitiveSymbol { //Apex A
+    public override Word? Produce(Word context, int i) {
+        if (Parser.Right<P>(context, i) && !PruningFunctions.Prune(((P) context[i + 1]).position.Get())) return new List<Symbol> {
+            new O(),
+            new F(),
+            new TurtleSymbols.Turn(Quaternion.AngleAxis(-180, Vector3.up)),
+            new A()
+        };
+        if (Parser.Right<P>(context, i) && PruningFunctions.Prune(((P)context[i + 1]).position.Get())) return new List<Symbol> {
+            new T(),
+            new Cut(),
+        };
+        return null;
     }
+    public override string ToString() { return "A"; }
+}
 
-    public override List<ContextFreeSymbol> Produce() {
-        if (age==maxAge) {
-            return new List<ContextFreeSymbol> {
-                GetMove(),
-                new TurtleSymbols.PlaceQuad(Vector3.forward*0.6f, Quaternion.AngleAxis(90, Vector3.up) * Quaternion.AngleAxis(180, Vector3.forward), materials[Random.Range(0,5)])
-            };
-        } else {
-            return new List<ContextFreeSymbol> {
-                GetMove(),
-                new TurtleSymbols.Turn(left * Quaternion.Slerp(Quaternion.identity, Random.rotationUniform, 0.1f)),
-                new TurtleSymbols.Push(),
-                new TurtleSymbols.Push(),
-                new NewTree(age+1, maxAge),
-                new TurtleSymbols.Pop(),
-                new TurtleSymbols.Turn(right),
-                GetMove(),
-                new TurtleSymbols.Pop(),
-                new TurtleSymbols.Turn(right),
-                GetMove(),
-                new TurtleSymbols.Push(),
-                new TurtleSymbols.Turn(right),
-                GetMove(),
-                new NewTree(age+1, maxAge),
-                new TurtleSymbols.Pop(),
-                new TurtleSymbols.Turn(left),
-                new NewTree(age+1, maxAge)
-            };
-        }
+public class O : ContextSensitiveSymbol { //Dormant bud
+    public override Word? Produce(Word context, int i) {
+        if (Parser.Right<S>(context, i)) return new List<Symbol> {
+            new TurtleSymbols.Push(),
+            new TurtleSymbols.Turn(Quaternion.AngleAxis(-25, Vector3.up)),
+            new F(),
+            new A(),
+            new P(),
+            new TurtleSymbols.Pop()
+    };
+        return null;
+    }
+    public override string ToString() { return "@o"; }
+}
+
+public class S : ContextFreeSymbol { //Bud-activating signal S
+    public override string ToString() { return "S"; }
+    public override Word Produce() { return new Word(); } //goes to the empty word
+}
+
+public class T : Terminal { //pruning signal T
+    public override string ToString() { return "T"; }
+}
+
+public class Cut : Terminal { //SPECIAL SYMBOL, immediately once produced the parser deletes symbols up to ]
+    public override string ToString() { return "%"; }
+}
+
+public class P : Terminal { //?P(x,y) positional query module
+    public QueryParameter<Vector3> position = new QueryParameter<Vector3>(); //unresolved parameter
+
+    public override void ResolveQueryParameters(StackState<TraversalState> s) {
+        position.Set(s.state.position);
     }
 
     public override string ToString() {
-        return "Tree";
+        if (!position.resolved) return "P(*,*,*)";
+        else {
+            Vector3 p = position.Get();
+            return $"P({p.x},{p.y},{p.z})";
+        }
+    }
+}
+
+public class CollidingTree : ContextFreeSymbol {
+    public CollidingTree(int n) { }
+    public override List<Symbol> Produce() {
+        return new List<Symbol> {
+            new F(),
+            new A(),
+            new P()
+        };
     }
 }

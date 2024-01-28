@@ -34,14 +34,14 @@ public class GradientTree : ContextFreeSymbol {
         return new TurtleSymbols.Move(l, r, colour);
     }
 
-    public override List<ContextFreeSymbol> Produce() {
+    public override List<Symbol> Produce() {
         if (age==maxAge) {
-            return new List<ContextFreeSymbol> {
+            return new List<Symbol> {
                 GetMove(),
                 new TurtleSymbols.PlaceQuad(Vector3.forward*0.6f, Quaternion.AngleAxis(90, Vector3.up) * Quaternion.AngleAxis(180, Vector3.forward), materials[Random.Range(0,5)])
             };
         } else {
-            return new List<ContextFreeSymbol> {
+            return new List<Symbol> {
                 GetMove(),
                 new TurtleSymbols.Turn(left * Quaternion.Slerp(Quaternion.identity, Random.rotationUniform, 0.1f)),
                 new TurtleSymbols.Push(),

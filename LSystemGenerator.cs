@@ -31,7 +31,7 @@ public class LSystemGenerator : MonoBehaviour {
         ContextFreeSymbol seed = (ContextFreeSymbol)Activator.CreateInstance(type, new System.Object[] { numIterations - 1});
 
 
-        List<ContextFreeSymbol> word = new List<ContextFreeSymbol> { seed };
+        List<Symbol> word = new List<Symbol> { seed };
         //Parse: iteratively expand
         for (int i = 0; i < numIterations; i++) {
             Debug.Log(i);

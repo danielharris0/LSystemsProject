@@ -34,7 +34,7 @@ public class GeometryState : State {
 
 public class CombinedState<T1, T2> : State where T1 : State where T2 : State {
     public T1 s1;
-    public T2 s2;
+    public  T2 s2;
     public CombinedState(T1 s1, T2 s2) { this.s1 = s1; this.s2 = s2; }
     public override void Parse(Terminal t) {
         if (!t.Apply(this)) {
@@ -57,8 +57,8 @@ public class StackState<T> : State where T : State {
 class Turtle {
     State state;
     public Turtle(State s) { state = s; }
-    public void Parse(List<ContextFreeSymbol> word) {
-        foreach (ContextFreeSymbol symbol in word) {
+    public void Parse(List<Symbol> word) {
+        foreach (Symbol symbol in word) {
             if (symbol is Terminal) state.Parse((Terminal) symbol);
         }
     }
