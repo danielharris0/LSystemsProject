@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ClassicFern : ContextFreeSymbol {
+public class ClassicFern : ContextFreeModule {
 
     private static Quaternion left = Quaternion.AngleAxis(-25, Vector3.up);
     private static Quaternion right = Quaternion.AngleAxis(25, Vector3.up);
@@ -13,25 +13,25 @@ public class ClassicFern : ContextFreeSymbol {
     public ClassicFern(int numIterations) { size = 1; }
     public ClassicFern(float s) { size = s; }
 
-    public override List<Symbol> Produce() {
-        return new List<Symbol> {
-            new TurtleSymbols.Move(size*5f, size*0.5f, Color.white),
-            new TurtleSymbols.Turn(left),
-            new TurtleSymbols.Push(),
-            new TurtleSymbols.Push(),
+    public override List<Module> Produce() {
+        return new List<Module> {
+            new TurtleModules.Move(size*5f, size*0.5f, Color.white),
+            new TurtleModules.Turn(left),
+            new TurtleModules.Push(),
+            new TurtleModules.Push(),
             new ClassicFern(size * sizeMult),
-            new TurtleSymbols.Pop(),
-            new TurtleSymbols.Turn(right),
-            new TurtleSymbols.Move(size*5f, size*0.5f, Color.white),
-            new TurtleSymbols.Pop(),
-            new TurtleSymbols.Turn(right),
-            new TurtleSymbols.Move(size*5f, size*0.5f, Color.white),
-            new TurtleSymbols.Push(),
-            new TurtleSymbols.Turn(right),
-            new TurtleSymbols.Move(size*5f, size*0.5f, Color.white),
+            new TurtleModules.Pop(),
+            new TurtleModules.Turn(right),
+            new TurtleModules.Move(size*5f, size*0.5f, Color.white),
+            new TurtleModules.Pop(),
+            new TurtleModules.Turn(right),
+            new TurtleModules.Move(size*5f, size*0.5f, Color.white),
+            new TurtleModules.Push(),
+            new TurtleModules.Turn(right),
+            new TurtleModules.Move(size*5f, size*0.5f, Color.white),
             new ClassicFern(size * sizeMult),
-            new TurtleSymbols.Pop(),
-            new TurtleSymbols.Turn(left),
+            new TurtleModules.Pop(),
+            new TurtleModules.Turn(left),
             new ClassicFern(size * sizeMult)
         };
     }

@@ -23,15 +23,7 @@ public static class TurtleFunctions {
 
         return true;
     }
-    public static bool Push<T> (StackState<T> s) where T : State {
-        s.stack.Push(s.state);
-        s.state = (T)s.state.Copy();
-        return true;
-    }
-    public static bool Pop<T>(StackState<T> s) where T : State {
-        s.state = s.stack.Pop();
-        return true;
-    }
+
     public static bool Move(TraversalState s, float distance, float finalRadius, Color finalColour) {
         s.position += s.orientation * Vector3.forward * distance;
         return true;

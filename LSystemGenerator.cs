@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 
 
-public enum Seed {ClassicFern, GradientTree, NewTree, CollidingTree }
+public enum Seed {ClassicFern, GradientTree, NewTree, E, Topiary}
 
 public class LSystemGenerator : MonoBehaviour {
     
@@ -28,16 +28,15 @@ public class LSystemGenerator : MonoBehaviour {
         }
 
         Type type = Type.GetType(seedType.ToString());
-        ContextFreeSymbol seed = (ContextFreeSymbol)Activator.CreateInstance(type, new System.Object[] { numIterations - 1});
+        ContextFreeModule seed = (ContextFreeModule) Activator.CreateInstance(type, new System.Object[] { numIterations - 1});
 
 
-        List<Symbol> word = new List<Symbol> { seed };
+        List<Module> word = new List<Module> { seed };
         //Parse: iteratively expand
         for (int i = 0; i < numIterations; i++) {
             Debug.Log(i);
             Parser.Print(word);
-            Parser.Interpret(word); //generate parameters for environ.-sensitive nodes
-            Parser.Print(word);
+            word = Parser.Interpret(word); //generate parameters for environ.-sensitive nodes
             word = Parser.Iterate(word);
         }
 

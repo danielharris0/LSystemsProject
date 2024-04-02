@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TurtleSymbols {
+public class TurtleModules {
 
     public class StopTubing : Terminal {
         public override bool Apply(GeometryState s) {
@@ -51,8 +51,7 @@ public class TurtleSymbols {
 
     public class Push : Terminal {
         public override bool Apply<T>(StackState<T> s) {
-            s.stack.Push(s.state);
-            s.state = (T) s.state.Copy();
+            s.stack.Push((T) s.stack.Peek().Copy()); //Push a copy of the top state in the stack onto the stack
             return true;
         }
 
@@ -60,7 +59,7 @@ public class TurtleSymbols {
     }
 
     public class Pop : Terminal {
-        public override bool Apply<T>(StackState<T> s) { s.state = s.stack.Pop(); return true; }
+        public override bool Apply<T>(StackState<T> s) { s.stack.Pop(); return true; }
 
         public override string ToString() { return "]"; }
 
