@@ -7,7 +7,9 @@ using System.Collections.Generic;
 public enum Seed {ClassicFern, GradientTree, NewTree, E, Topiary}
 
 public class LSystemGenerator : MonoBehaviour {
-    
+
+    public ObstacleManager obstacleManager;
+
     public Seed seedType;
     public int setRandomSeed;
     public bool mergeMeshes;
@@ -34,8 +36,8 @@ public class LSystemGenerator : MonoBehaviour {
         List<Module> word = new List<Module> { seed };
         //Parse: iteratively expand
         for (int i = 0; i < numIterations; i++) {
-            Debug.Log(i);
-            Parser.Print(word);
+            //Debug.Log(i);
+           // Parser.Print(word);
             word = Parser.Interpret(word); //generate parameters for environ.-sensitive nodes
             word = Parser.Iterate(word);
         }
@@ -62,10 +64,11 @@ public class LSystemGenerator : MonoBehaviour {
 }
 
 [CustomEditor(typeof(LSystemGenerator))]
-public class MyScriptEditor : Editor {
+public class LSystemEditor : Editor {
     public override void OnInspectorGUI() {
         DrawDefaultInspector();
         if (GUILayout.Button("Generate")) {
+            Environment.LoadObstacles(((LSystemGenerator) target).obstacleManager);
             LSystemGenerator script = (LSystemGenerator) target;
             script.Generate();
         }

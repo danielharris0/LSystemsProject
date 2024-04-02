@@ -152,7 +152,7 @@ public class B : ContextSensitiveModule {
         Module? right = context.Get(1); //Context-sensitive pattern-matching
         Debug.Assert(right != null);
         if (right is S) {
-            Debug.Log("Bud recieved signal");
+            //Debug.Log("Bud recieved signal");
             return new List<Module> {
                 new TurtleModules.Push(),
                 new Turn(Quaternion.AngleAxis(Constants.alpha, Vector3.up)),
