@@ -16,7 +16,8 @@ public static class Environment {
             GameObject obj = child.gameObject;
             string name = obj.GetComponent<MeshFilter>().name;
             if (name == "Cube") containers.Add(new CuboidCollider(child.position - child.localScale/2, child.localScale));
-            if (name == "Sphere") containers.Add(new SphereCollider(child.position, child.localScale.x));
+            if (name == "Sphere") containers.Add(new SphereCollider(child.position, child.localScale.x/2));
+            if (name == "Cylinder") containers.Add(new CylinderCollider(child.position - Vector3.up*child.localScale.y, child.localScale.x / 2, child.localScale.y*2));
         }
     }
 
