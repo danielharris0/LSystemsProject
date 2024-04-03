@@ -3,9 +3,12 @@ using UnityEditor;
 using System.Collections.Generic;
 
 
+public enum ObstacleMode {Contain, Obstruct}
 
 
-public class ObstacleManager : MonoBehaviour { }
+public class ObstacleManager : MonoBehaviour {
+    public ObstacleMode obstacleMode;
+}
 
 [CustomEditor(typeof(ObstacleManager))]
 public class ObstacleEditor : Editor {

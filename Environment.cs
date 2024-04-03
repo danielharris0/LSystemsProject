@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public static class Environment {
 
+    private static ObstacleMode obstacleMode;
+
     public static List<PrimitiveCollider> containers = new List<PrimitiveCollider>();
 
     private static bool InUnitCube(Vector3 v) {
@@ -11,6 +13,7 @@ public static class Environment {
     }
 
     public static void LoadObstacles(ObstacleManager obstacleManager) {
+        obstacleMode = obstacleManager.obstacleMode;
         containers = new List<PrimitiveCollider>();
         foreach (Transform child in obstacleManager.transform) {
             GameObject obj = child.gameObject;
@@ -25,11 +28,18 @@ public static class Environment {
 
     //Optimisation: make this concurrent to the string rewriting (but probably not neccesary)
     public static bool Query(TraversalState traversalState, ContextFreeQueryModule queryModule) { //temp. return data: a simple pruning function
-        //return !InUnitCube(traversalState.position / 10 + new Vector3(0.5f, 0, 0.5f));
-        foreach (PrimitiveCollider collider in containers) {
-            if (collider.Contains(traversalState.position)) return false;
+        if (obstacleMode == ObstacleMode.Contain) {
+            foreach (PrimitiveCollider collider in containers) {
+                if (collider.Contains(traversalState.position)) return false;
+            }
+            return true;
+        } else {
+            foreach (PrimitiveCollider collider in containers) {
+                if (collider.Contains(traversalState.position)) return true;
+            }
+            return false;
         }
-        return true;
+
     }
 }
 

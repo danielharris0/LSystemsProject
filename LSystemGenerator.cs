@@ -36,8 +36,6 @@ public class LSystemGenerator : MonoBehaviour {
         List<Module> word = new List<Module> { seed };
         //Parse: iteratively expand
         for (int i = 0; i < numIterations; i++) {
-            //Debug.Log(i);
-           // Parser.Print(word);
             word = Parser.Interpret(word); //generate parameters for environ.-sensitive nodes
             word = Parser.Iterate(word);
         }

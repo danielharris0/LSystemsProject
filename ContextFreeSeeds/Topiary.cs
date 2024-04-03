@@ -16,11 +16,7 @@ public static class Constants {
     public const float length = 1f;
     public const float radius = 0.1f;
 
-    private static Material leafMaterial = Resources.Load<Material>("Leaf/leafMaterial");
-
-    public static Module Leaf() {
-        return new TurtleModules.PlaceQuad(Vector3.forward * 0.6f, Quaternion.AngleAxis(90, Vector3.up) * Quaternion.AngleAxis(180, Vector3.forward), leafMaterial);
-    }
+    public static Material leafMaterial = Resources.Load<Material>("Leaf/leafMaterial");
 }
 
 public class Topiary : ContextFreeModule {
@@ -88,6 +84,7 @@ public class Turn: ContextSensitiveModule {
     }
 }
 
+//Apex (terminal branch segment)
 public class A : ContextSensitiveModule {
 
     //Parameter
@@ -141,12 +138,17 @@ public class A : ContextSensitiveModule {
     }
 }
 
+//Bud
 public class B : ContextSensitiveModule {
 
     //Parameter
     private int n = 0; private int m = 0;
 
     public B(int m, int n) { this.n = n; this.m = m; }
+
+    /*public override bool Apply(GeometryState s) {
+        return new TurtleModules.PlaceQuad(Vector3.forward * 0.6f, Quaternion.AngleAxis(90, Vector3.up) * Quaternion.AngleAxis(180, Vector3.forward) * Quaternion.AngleAxis(Random.Range(-20,20), Vector3.forward), Constants.leafMaterial).Apply(s);
+    }*/
 
     public override List<Module> Produce(Context context) {
         Module? right = context.Get(1); //Context-sensitive pattern-matching
