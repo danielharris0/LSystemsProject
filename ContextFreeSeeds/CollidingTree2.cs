@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-
-namespace Topiary {
+namespace CollidingTree2 {
 
     public static class Constants {
         //Constant
@@ -15,8 +13,8 @@ namespace Topiary {
         public const int b = 1;
         public const int c = -5;
 
-        public const float length = 1f;
-        public const float radius = 0.1f;
+        public const float length = 3f;
+        public const float radius = 1f;
 
         public static Material leafMaterial = Resources.Load<Material>("Leaf/leafMaterial");
     }
@@ -26,7 +24,7 @@ namespace Topiary {
 
         public override List<Module> Produce() {
             return new List<Module> {
-            new F(),
+            new Move(1),
             new A(1),
             new P()
         };
@@ -59,8 +57,18 @@ namespace Topiary {
         }
     }
 
-    public class F : ContextSensitiveModule {
-        private static Module forward = new TurtleModules.Move(Constants.length, Constants.radius, Color.white);
+    public class Move : ContextSensitiveModule {
+
+        //Age
+        private int k;
+        private Module forward;
+
+        public Move(int k) {
+            this.k = k;
+            float shade = Mathf.Max(1 - 1 / k, 0.2f);
+            forward = new TurtleModules.Move(Constants.length, Constants.radius * Mathf.Pow(2,-k/2), new Color(shade,shade,shade));
+        }
+
         public override bool Apply(TraversalState s) { return forward.Apply(s); }
         public override bool Apply<T1, T2>(CombinedState<T1, T2> s) { return forward.Apply(s); }
 
@@ -68,9 +76,9 @@ namespace Topiary {
             Module right = context.Get(1); //Context-sensitive pattern-matching
             if (right != null) {
                 if (right is T) return new List<Module> { new S() };
-                else if (right is S) return new List<Module> { new S(), new F() };
+                else if (right is S) return new List<Module> { new S(), new Move(k) };
             }
-            return new List<Module> { new F() }; //default identity production
+            return new List<Module> { new Move(k) }; //default identity production
         }
     }
 
@@ -85,7 +93,6 @@ namespace Topiary {
             return new List<Module> { new Turn(r) }; //default identity production
         }
     }
-
 
     //Apex (terminal branch segment)
     public class A : ContextSensitiveModule {
@@ -109,12 +116,12 @@ namespace Topiary {
                         new Turn(Quaternion.AngleAxis(Constants.phi, Vector3.forward)),
                         new TurtleModules.Push(),
                         new Turn(Quaternion.AngleAxis(Constants.alpha, Vector3.up)),
-                        new F(),
+                        new Move(k),
                         new A(k+1),
                         new P(),
                         new TurtleModules.Pop(),
                         new Turn(Quaternion.AngleAxis(-Constants.beta, Vector3.up)),
-                        new F(),
+                        new Move(k),
                         new A(k+1)
                     };
                     } else {
@@ -122,7 +129,7 @@ namespace Topiary {
                         new Turn(Quaternion.AngleAxis(Constants.phi, Vector3.forward)),
                         new B(k+1, k+1),
                         new Turn(Quaternion.AngleAxis(-Constants.beta, Vector3.up)),
-                        new F(),
+                        new Move(k),
                         new A(k+1)
                     };
                     }
@@ -161,12 +168,12 @@ namespace Topiary {
                 return new List<Module> {
                 new TurtleModules.Push(),
                 new Turn(Quaternion.AngleAxis(Constants.alpha, Vector3.up)),
-                new F(),
+                new Move(n),
                 new A(Constants.a * m + Constants.b * n + Constants.c),
                 new P(),
                 new TurtleModules.Pop()
             };
-            } else if (right is F) {
+            } else if (right is Move) {
                 return new List<Module> {
                 new B(m+1,n)
             };

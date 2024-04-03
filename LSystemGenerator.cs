@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 
 
-public enum Seed {ClassicFern, GradientTree, NewTree, E, Topiary}
+public enum Seed {ClassicFern, GradientTree, NewTree, E, Topiary, CollidingTree, CollidingTree2 }
 
 public class LSystemGenerator : MonoBehaviour {
 
@@ -29,22 +29,23 @@ public class LSystemGenerator : MonoBehaviour {
             UnityEngine.Object.DestroyImmediate(transform.GetChild(0).gameObject);
         }
 
-        Type type = Type.GetType(seedType.ToString());
+        Type type = Type.GetType(seedType.ToString() + ".Axiom");
         ContextFreeModule seed = (ContextFreeModule) Activator.CreateInstance(type, new System.Object[] { numIterations - 1});
 
 
         List<Module> word = new List<Module> { seed };
         //Parse: iteratively expand
         for (int i = 0; i < numIterations; i++) {
-            word = Parser.Interpret(word); //generate parameters for environ.-sensitive nodes
+            word = Parser.Interpret(word, transform.position); //generate parameters for environ.-sensitive nodes
             word = Parser.Iterate(word);
+            Parser.Print(word);
         }
 
         //Interpret with turtle: creating tree of objects
           new Turtle(
             new StackState<CombinedState<TraversalState, GeometryState>>(
                 new CombinedState<TraversalState, GeometryState>(
-                    new TraversalState(),
+                    new TraversalState(transform.position),
                     new GeometryState(gameObject)
         )))
             .Parse(word);

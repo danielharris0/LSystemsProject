@@ -39,9 +39,9 @@ public static class Parser {
         for (int i = 0; i < word.Count; i++) { s += word[i].ToString() + ", "; }
         Debug.Log(s);   
     }
-    public static Word Interpret(Word word) {
+    public static Word Interpret(Word word, Vector3 startingPosition) {
         Word newWord = new Word();
-        StackState<TraversalState> state = new StackState<TraversalState>(new TraversalState());
+        StackState<TraversalState> state = new StackState<TraversalState>(new TraversalState(startingPosition));
 
         for (int i = 0; i < word.Count; i++) {
 

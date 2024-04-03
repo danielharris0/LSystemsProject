@@ -57,7 +57,7 @@ public class CuboidCollider : PrimitiveCollider {
     }
 }
 public class SphereCollider : PrimitiveCollider {
-    private Vector3 position; private float radius;
+    public Vector3 position; public float radius;
     public SphereCollider(Vector3 position, float radius) { this.position = position; this.radius = radius;}
     public override bool Contains(Vector3 p) {
         Vector3 v = p - position;

@@ -1,102 +1,75 @@
-
-/*
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Word = System.Collections.Generic.List<Module>;
 
-#nullable enable
 
-public static class PruningFunctions {
-    public static int L = 10;
-    //Prunes to LxLxL cube centered at the origin
-    public static bool Prune(Vector3 p) =>  p.x < -L / 2 || p.x > L / 2 || p.y < -L / 2 || p.y > L / 2 || p.z < -L / 2 || p.z > L / 2;
-}
 
-public class F : ContextSensitiveModule { //Internode F
-    public override Word? Produce(Word context, int i) {
-        if (Parser.Right<T>(context, i)) return new List<Module> { new S() };
-        if (Parser.Right<S>(context, i)) return new List<Module> { new S(), new F() }; //propogates S basipetally (down)
+namespace CollidingTree {
 
-        return null;
+    public static class Constants {
+        public const float phi = 90;
+        public const float alpha = 32;
+        public const float beta = 20;
+
+        public const float length = 3f;
+        public const float radius = 0.1f;
+
+        public static Material leafMaterial = Resources.Load<Material>("Leaf/leafMaterial");
+        public static TurtleModules.Move GetMove() {
+            return new TurtleModules.Move(Constants.length, Constants.radius, Color.white);
+        }
     }
 
-    public override bool Apply<T1, T2>(CombinedState<T1, T2> state) {
-        return TurtleFunctions.Move<T1, T2>(state, 1, 1, Color.white);
+    public class Axiom : ContextFreeModule {
+        private int maxAge;
+        public Axiom(int numIterations) { maxAge = numIterations; }
+
+        public override List<Module> Produce() {
+            return new List<Module> {
+                new Apex(1, maxAge),
+            };
+        }
     }
 
-    public override string ToString() { return "F"; }
-}
+    public class Apex : ContextFreeQueryModule {
+        //Parameter
+        private int age;
+        private bool prune;
+        private int maxAge; //(constant)
 
-public class A : ContextSensitiveModule { //Apex A
-    public override Word? Produce(Word context, int i) {
-        if (Parser.Right<P>(context, i) && !PruningFunctions.Prune(((P) context[i + 1]).position.Get())) return new List<Module> {
-            new O(),
-            new F(),
-            new TurtleModules.Turn(Quaternion.AngleAxis(-180, Vector3.up)),
-            new A()
-        };
-        if (Parser.Right<P>(context, i) && PruningFunctions.Prune(((P)context[i + 1]).position.Get())) return new List<Module> {
-            new T(),
-            new Cut(),
-        };
-        return null;
-    }
-    public override string ToString() { return "A"; }
-}
+        public Apex(int age, int maxAge) { this.age = age; this.maxAge = maxAge; }
 
-public class O : ContextSensitiveModule { //Dormant bud
-    public override Word? Produce(Word context, int i) {
-        if (Parser.Right<S>(context, i)) return new List<Module> {
-            new TurtleModules.Push(),
-            new TurtleModules.Turn(Quaternion.AngleAxis(-25, Vector3.up)),
-            new F(),
-            new A(),
-            new P(),
-            new TurtleModules.Pop()
-    };
-        return null;
-    }
-    public override string ToString() { return "@o"; }
-}
+        public override void Query(TraversalState traversalState) {
+            prune = Environment.Query(traversalState, this);
+        }
 
-public class S : ContextFreeModule { //Bud-activating signal S
-    public override string ToString() { return "S"; }
-    public override Word Produce() { return new Word(); } //goes to the empty word
-}
 
-public class T : Terminal { //pruning signal T
-    public override string ToString() { return "T"; }
-}
+        public override bool Apply(TraversalState s) { return Constants.GetMove().Apply(s); }
+        public override bool Apply<T1, T2>(CombinedState<T1, T2> s) { return Constants.GetMove().Apply(s); }
 
-public class Cut : Terminal { //SPECIAL Module, immediately once produced the parser deletes Modules up to ]
-    public override string ToString() { return "%"; }
-}
+        public override List<Module> Produce() {
+            if (prune) {
+                return new List<Module> {
+                    new TurtleModules.PlaceQuad(Vector3.forward*3f, Quaternion.AngleAxis(90, Vector3.up) * Quaternion.AngleAxis(180, Vector3.forward), Constants.leafMaterial)
+                };
+            } else if (age >= maxAge) {
+                return new List<Module> {
+                    new TurtleModules.PlaceQuad(Vector3.forward*3f, Quaternion.AngleAxis(90, Vector3.up) * Quaternion.AngleAxis(180, Vector3.forward), Constants.leafMaterial)
+                };
+            } else {
+                return new List<Module> {
+                    Constants.GetMove(),
 
-public class P : Terminal { //?P(x,y) positional query module
-    public QueryParameter<Vector3> position = new QueryParameter<Vector3>(); //unresolved parameter
+                    new TurtleModules.Turn(Quaternion.AngleAxis(Constants.phi, Vector3.forward)),
 
-    public override void ResolveQueryParameters(StackState<TraversalState> s) {
-        position.Set(s.state.position);
-    }
+                    new TurtleModules.Push(),
+                        new TurtleModules.Turn(Quaternion.AngleAxis(Constants.alpha, Vector3.up)),
+                        new Apex(age+1, maxAge),
+                    new TurtleModules.Pop(),
 
-    public override string ToString() {
-        if (!position.resolved) return "P(*,*,*)";
-        else {
-            Vector3 p = position.Get();
-            return $"P({p.x},{p.y},{p.z})";
+                    new TurtleModules.Turn(Quaternion.AngleAxis(-Constants.beta, Vector3.up)),
+                    new Apex(age+1, maxAge)
+                };
+            }
         }
     }
 }
-
-public class CollidingTree : ContextFreeModule {
-    public CollidingTree(int n) { }
-    public override List<Module> Produce() {
-        return new List<Module> {
-            new F(),
-            new A(),
-            new P()
-        };
-    }
-}
-*/

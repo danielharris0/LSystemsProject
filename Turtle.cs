@@ -16,6 +16,7 @@ public class TraversalState : State {
     public Quaternion orientation = Quaternion.LookRotation(Vector3.up, Vector3.right);
     public override void Parse(Module t) { t.Apply(this); }
 
+    public TraversalState(Vector3 position) { this.position = position; }
 }
 
 public class GeometryState : State {
