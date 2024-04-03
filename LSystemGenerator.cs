@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 
 
-public enum Seed {ClassicFern, GradientTree, NewTree, E, Topiary, CollidingTree, CollidingTree2 }
+public enum Seed {ClassicFern, GradientTree, NewTree, Topiary, CollidingTree }
 
 public class LSystemGenerator : MonoBehaviour {
 

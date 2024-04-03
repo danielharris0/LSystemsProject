@@ -14,14 +14,16 @@ namespace CollidingTree {
         public const float radius = 0.1f;
 
         public static Material leafMaterial = Resources.Load<Material>("Leaf/leafMaterial");
-        public static TurtleModules.Move GetMove() {
-            return new TurtleModules.Move(Constants.length, Constants.radius, Color.white);
+        public static TurtleModules.Move GetMove(int age, int maxAge) {
+            float n = (float) age / (float) maxAge;
+            //Radius motivation: Da Vinci: https://prism.ucalgary.ca/server/api/core/bitstreams/407e4fd6-92f5-494f-bc98-85c8bfcda65c/content
+            return new TurtleModules.Move(Constants.length, Interpolation.Linear(2f, 0.00005f, Mathf.Pow(n, 0.25f)) , Color.white);
         }
     }
 
     public class Axiom : ContextFreeModule {
         private int maxAge;
-        public Axiom(int numIterations) { maxAge = numIterations; }
+        public Axiom(int numIterations) { maxAge = 10; }
 
         public override List<Module> Produce() {
             return new List<Module> {
@@ -43,13 +45,15 @@ namespace CollidingTree {
         }
 
 
-        public override bool Apply(TraversalState s) { return Constants.GetMove().Apply(s); }
-        public override bool Apply<T1, T2>(CombinedState<T1, T2> s) { return Constants.GetMove().Apply(s); }
+        public override bool Apply(TraversalState s) { return Constants.GetMove(age,maxAge).Apply(s); }
+        public override bool Apply<T1, T2>(CombinedState<T1, T2> s) { return Constants.GetMove(age, maxAge).Apply(s); }
 
         public override List<Module> Produce() {
             if (prune) {
                 return new List<Module> {
-                    new TurtleModules.PlaceQuad(Vector3.forward*3f, Quaternion.AngleAxis(90, Vector3.up) * Quaternion.AngleAxis(180, Vector3.forward), Constants.leafMaterial)
+                    new TurtleModules.Turn(Quaternion.Lerp(Quaternion.identity, Random.rotationUniform, 0.2f)),
+                    new Apex(age, maxAge)
+                    //new TurtleModules.PlaceQuad(Vector3.forward*3f, Quaternion.AngleAxis(90, Vector3.up) * Quaternion.AngleAxis(180, Vector3.forward), Constants.leafMaterial)
                 };
             } else if (age >= maxAge) {
                 return new List<Module> {
@@ -57,7 +61,7 @@ namespace CollidingTree {
                 };
             } else {
                 return new List<Module> {
-                    Constants.GetMove(),
+                    Constants.GetMove(age,maxAge),
 
                     new TurtleModules.Turn(Quaternion.AngleAxis(Constants.phi, Vector3.forward)),
 

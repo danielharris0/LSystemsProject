@@ -26,7 +26,7 @@ namespace Topiary {
 
         public override List<Module> Produce() {
             return new List<Module> {
-            new F(),
+            new Internode(),
             new A(1),
             new P()
         };
@@ -59,7 +59,7 @@ namespace Topiary {
         }
     }
 
-    public class F : ContextSensitiveModule {
+    public class Internode : ContextSensitiveModule { //Aka "F"
         private static Module forward = new TurtleModules.Move(Constants.length, Constants.radius, Color.white);
         public override bool Apply(TraversalState s) { return forward.Apply(s); }
         public override bool Apply<T1, T2>(CombinedState<T1, T2> s) { return forward.Apply(s); }
@@ -68,9 +68,9 @@ namespace Topiary {
             Module right = context.Get(1); //Context-sensitive pattern-matching
             if (right != null) {
                 if (right is T) return new List<Module> { new S() };
-                else if (right is S) return new List<Module> { new S(), new F() };
+                else if (right is S) return new List<Module> { new S(), new Internode() };
             }
-            return new List<Module> { new F() }; //default identity production
+            return new List<Module> { new Internode() }; //default identity production
         }
     }
 
@@ -109,12 +109,12 @@ namespace Topiary {
                         new Turn(Quaternion.AngleAxis(Constants.phi, Vector3.forward)),
                         new TurtleModules.Push(),
                         new Turn(Quaternion.AngleAxis(Constants.alpha, Vector3.up)),
-                        new F(),
+                        new Internode(),
                         new A(k+1),
                         new P(),
                         new TurtleModules.Pop(),
                         new Turn(Quaternion.AngleAxis(-Constants.beta, Vector3.up)),
-                        new F(),
+                        new Internode(),
                         new A(k+1)
                     };
                     } else {
@@ -122,7 +122,7 @@ namespace Topiary {
                         new Turn(Quaternion.AngleAxis(Constants.phi, Vector3.forward)),
                         new B(k+1, k+1),
                         new Turn(Quaternion.AngleAxis(-Constants.beta, Vector3.up)),
-                        new F(),
+                        new Internode(),
                         new A(k+1)
                     };
                     }
@@ -161,12 +161,12 @@ namespace Topiary {
                 return new List<Module> {
                 new TurtleModules.Push(),
                 new Turn(Quaternion.AngleAxis(Constants.alpha, Vector3.up)),
-                new F(),
+                new Internode(),
                 new A(Constants.a * m + Constants.b * n + Constants.c),
                 new P(),
                 new TurtleModules.Pop()
             };
-            } else if (right is F) {
+            } else if (right is Internode) {
                 return new List<Module> {
                 new B(m+1,n)
             };
