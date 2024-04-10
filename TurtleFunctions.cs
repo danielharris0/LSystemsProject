@@ -11,19 +11,6 @@ public static class TurtleFunctions {
         return true;
     }
 
-    public static bool PlaceQuad(GeometryState s, Material spriteMaterial, Quaternion rotation, Vector3 offset) {
-        GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        GameObject.DestroyImmediate(obj.GetComponent<MeshCollider>());
-        MeshRenderer meshRenderer = obj.GetComponent<MeshRenderer>();
-        meshRenderer.material = spriteMaterial;
-
-        obj.transform.SetParent(s.parent.transform, false);
-        obj.transform.rotation *= rotation;
-        obj.transform.position += s.parent.transform.rotation * offset;
-
-        return true;
-    }
-
     public static bool Move(TraversalState s, float distance, float finalRadius, Color finalColour) {
         s.position += s.orientation * Vector3.forward * distance;
         return true;

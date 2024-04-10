@@ -28,11 +28,12 @@ public class TurtleModules {
         Vector3 offset;
         Quaternion rotation;
         Material spriteMaterial;
+        float scale;
 
         public override string ToString() { return "PlaceQuad"; }
 
-        public PlaceQuad(Vector3 o, Quaternion r, Material m) {
-            offset = o; rotation = r; spriteMaterial = m;
+        public PlaceQuad(Vector3 o, Quaternion r, Material m, float scale = 1) {
+            offset = o; rotation = r; spriteMaterial = m; this.scale = scale;
         }
 
         public override bool Apply(GeometryState s) {
@@ -44,6 +45,7 @@ public class TurtleModules {
             obj.transform.SetParent(s.parent.transform, false);
             obj.transform.rotation *= rotation;
             obj.transform.position += s.parent.transform.rotation * offset;
+            obj.transform.localScale *= scale;
 
             return true;
         }

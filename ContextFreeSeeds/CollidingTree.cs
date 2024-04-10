@@ -13,7 +13,7 @@ namespace CollidingTree {
         public const float length = 3f;
         public const float radius = 0.1f;
 
-        public static Material leafMaterial = Resources.Load<Material>("Leaf/leafMaterial");
+        public static Material leafMaterial = Resources.Load<Material>("Leaf/leafMaterial2");
         public static TurtleModules.Move GetMove(int age, int maxAge) {
             float n = (float) age / (float) maxAge;
             //Radius motivation: Da Vinci: https://prism.ucalgary.ca/server/api/core/bitstreams/407e4fd6-92f5-494f-bc98-85c8bfcda65c/content
@@ -23,7 +23,7 @@ namespace CollidingTree {
 
     public class Axiom : ContextFreeModule {
         private int maxAge;
-        public Axiom(int numIterations) { maxAge = 10; }
+        public Axiom(int numIterations) { maxAge = 15; }
 
         public override List<Module> Produce() {
             return new List<Module> {
@@ -57,7 +57,7 @@ namespace CollidingTree {
                 };
             } else if (age >= maxAge) {
                 return new List<Module> {
-                    new TurtleModules.PlaceQuad(Vector3.forward*3f, Quaternion.AngleAxis(90, Vector3.up) * Quaternion.AngleAxis(180, Vector3.forward), Constants.leafMaterial)
+                    new TurtleModules.PlaceQuad(Vector3.forward*3f, Quaternion.AngleAxis(90, Vector3.up) * Quaternion.AngleAxis(180, Vector3.forward), Constants.leafMaterial, 4)
                 };
             } else {
                 return new List<Module> {
@@ -67,11 +67,11 @@ namespace CollidingTree {
 
                     new TurtleModules.Push(),
                         new TurtleModules.Turn(Quaternion.AngleAxis(Constants.alpha, Vector3.up)),
-                        new Apex(age+1, maxAge),
+                        new Apex(age+3, maxAge), //LATERAL apex (higher age, dies sooner)
                     new TurtleModules.Pop(),
 
                     new TurtleModules.Turn(Quaternion.AngleAxis(-Constants.beta, Vector3.up)),
-                    new Apex(age+1, maxAge)
+                    new Apex(age+1, maxAge) //First-order branch
                 };
             }
         }
