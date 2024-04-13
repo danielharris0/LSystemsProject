@@ -4,14 +4,14 @@ using System;
 using System.Collections.Generic;
 
 
-public enum Seed {ClassicFern, GradientTree, NewTree, Topiary, CollidingTree }
+public enum Seed {ClassicFern, GradientTree, NewTree, Topiary, CollidingTree, Fern, Conifer }
 
 public class LSystemGenerator : MonoBehaviour {
 
     public ObstacleManager obstacleManager;
 
-    public Seed seedType;
-    public int setRandomSeed;
+    public Seed lSystem;
+    public int seed;
     public bool mergeMeshes;
     public bool randomiseSeed;
     public int numIterations;
@@ -20,20 +20,20 @@ public class LSystemGenerator : MonoBehaviour {
         Debug.Log("Generating...");
 
         if (randomiseSeed) {
-            setRandomSeed = UnityEngine.Random.Range(0, 1000);
+            seed = UnityEngine.Random.Range(0, 1000);
         }
-        UnityEngine.Random.InitState(setRandomSeed);
+        UnityEngine.Random.InitState(seed);
 
         //Kill existing children
         while (transform.childCount > 0) {
             UnityEngine.Object.DestroyImmediate(transform.GetChild(0).gameObject);
         }
 
-        Type type = Type.GetType(seedType.ToString() + ".Axiom");
-        ContextFreeModule seed = (ContextFreeModule) Activator.CreateInstance(type, new System.Object[] { numIterations - 1});
+        Type type = Type.GetType(lSystem.ToString() + ".Axiom");
+        ContextFreeModule axiom = (ContextFreeModule) Activator.CreateInstance(type, new System.Object[] { numIterations - 1});
 
 
-        List<Module> word = new List<Module> { seed };
+        List<Module> word = new List<Module> { axiom };
         //Parse: iteratively expand
         for (int i = 0; i < numIterations; i++) {
             word = Parser.Interpret(word, transform.position); //generate parameters for environ.-sensitive nodes

@@ -13,7 +13,6 @@ public static class MeshBuilder {
     }
 
     public static Mesh Tube(float length, int n, float rA, float rB, TubeOptions options) {
-
         /*
          
         Returns a cylindrical mesh facing in the (Vector3.forward) z-direction
